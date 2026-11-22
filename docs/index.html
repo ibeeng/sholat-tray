@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sholat Tray: pengingat waktu sholat untuk desktop Linux</title>
+  <meta name="description" content="Jadwal sholat di bar, notifikasi 10 menit sebelum waktunya, adzan, dan layar pengingat saat masuk waktu. Untuk Omarchy, Hyprland, XFCE, dan KDE. Open source, MIT.">
+  <meta name="theme-color" content="#0f0e0c">
+  <meta property="og:title" content="Sholat Tray">
+  <meta property="og:description" content="Pengingat waktu sholat untuk desktop Linux: Omarchy, Hyprland, XFCE, KDE.">
+  <meta property="og:image" content="img/screenshot-digital.png">
+  <link rel="icon" href="img/icon.svg" type="image/svg+xml">
+  <link rel="preload" href="fonts/big-shoulders-display.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="style.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <a class="skip" href="#isi">Langsung ke isi</a>
+
+  <header class="top">
+    <a class="brand" href="#isi">
+      <img src="img/icon.svg" alt="" width="28" height="28">
+      <span>Sholat Tray</span>
+    </a>
+    <nav aria-label="Navigasi utama">
+      <ul>
+        <li class="wide"><a href="#gaya">Gaya</a></li>
+        <li class="wide"><a href="#widget">Widget</a></li>
+        <li class="wide"><a href="#jadwal">Cek jadwal</a></li>
+        <li><a href="#pasang">Pasang</a></li>
+        <li><a href="https://github.com/ibeeng/sholat-tray">GitHub</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main id="isi">
+    <!-- Papan running text: motif utama, diambil dari gaya "Teks berjalan" di app -->
+    <section class="board" aria-label="Papan teks berjalan">
+      <div class="board-track" id="board-track">
+        <p class="board-text">Telah masuk waktu sholat Maghrib untuk wilayah Jakarta dan sekitarnya <span class="star" aria-hidden="true">✦</span> <span lang="ar" dir="rtl">حَيَّ عَلَى الصَّلَاةِ</span> <span class="star" aria-hidden="true">✦</span> Mari tunaikan sholat <span class="star" aria-hidden="true">✦</span></p>
+        <p class="board-text" aria-hidden="true">Telah masuk waktu sholat Maghrib untuk wilayah Jakarta dan sekitarnya <span class="star">✦</span> <span lang="ar" dir="rtl">حَيَّ عَلَى الصَّلَاةِ</span> <span class="star">✦</span> Mari tunaikan sholat <span class="star">✦</span></p>
+      </div>
+      <button class="board-pause" id="board-pause" type="button" aria-pressed="false">Jeda</button>
+    </section>
+
+    <section class="hero">
+      <div class="hero-copy">
+        <h1>Pengingat sholat yang tinggal di desktop Linux&#8209;mu.</h1>
+        <p class="lede">Jadwal hari ini di bar, notifikasi 10 menit sebelum waktunya, lalu adzan dan layar pengingat begitu masuk waktu. Jalan di Omarchy, Hyprland, XFCE, dan KDE.</p>
+        <div class="cta">
+          <a class="btn btn-amber" href="#pasang">Pasang di Linux</a>
+          <a class="btn btn-line" href="https://github.com/ibeeng/sholat-tray">Baca kodenya di GitHub</a>
+        </div>
+      </div>
+      <figure class="hero-clock">
+        <svg id="clock" class="seg" role="img" aria-label="Jam di perangkatmu" viewBox="0 0 400 120" width="400" height="120"></svg>
+        <figcaption>Jam di perangkatmu sekarang, digambar seperti gaya <a href="#gaya" data-tab="digital">Digital</a>.</figcaption>
+      </figure>
+    </section>
+
+    <section id="gaya" class="styles" aria-labelledby="gaya-judul">
+      <div class="styles-head">
+        <h2 id="gaya-judul">Empat cara mengingatkan</h2>
+        <p>Pilih gaya layar pengingat dari widget bar atau menu tray. Warnanya bisa ikut tema Omarchy, atau pakai salah satu dari empat preset.</p>
+      </div>
+      <div class="styles-body">
+        <div class="tablist" role="tablist" aria-label="Gaya layar pengingat">
+          <button role="tab" id="tab-kartu" aria-controls="panel-kartu" aria-selected="true" type="button">
+            <span class="tab-name">Kartu</span>
+            <span class="tab-desc">Kartu bergambar langit di atas desktop yang diburamkan.</span>
+          </button>
+          <button role="tab" id="tab-digital" aria-controls="panel-digital" aria-selected="false" tabindex="-1" type="button">
+            <span class="tab-name">Digital</span>
+            <span class="tab-desc">Jam 7-segmen besar ala jam masjid, plus hitungan sejak adzan.</span>
+          </button>
+          <button role="tab" id="tab-teks" aria-controls="panel-teks" aria-selected="false" tabindex="-1" type="button">
+            <span class="tab-name">Teks berjalan</span>
+            <span class="tab-desc">Banner tipis di atas layar. Tidak menutup kerjaan, tidak merebut fokus.</span>
+          </button>
+          <button role="tab" id="tab-minimal" aria-controls="panel-minimal" aria-selected="false" tabindex="-1" type="button">
+            <span class="tab-name">Minimal</span>
+            <span class="tab-desc">Nama sholat besar dan lafaz panggilan sholat, tanpa hiasan.</span>
+          </button>
+        </div>
+
+        <div class="panels">
+          <figure class="panel" role="tabpanel" id="panel-kartu" aria-labelledby="tab-kartu">
+            <img src="img/screenshot-kartu.png" width="660" height="580" alt="Layar pengingat gaya Kartu: kartu dengan langit biru ke oranye, tulisan Maghrib 17:51 Jakarta, tombol Tutup dan Tunda 5 menit." loading="lazy">
+            <figcaption>Kartu, warna Senja.</figcaption>
+          </figure>
+          <figure class="panel" role="tabpanel" id="panel-digital" aria-labelledby="tab-digital" hidden>
+            <img src="img/screenshot-digital.png" width="960" height="521" alt="Layar pengingat gaya Digital: jam 7-segmen kuning besar, tulisan Maghrib dan Adzan 17:51." loading="lazy">
+            <figcaption>Digital, warna Masjid.</figcaption>
+          </figure>
+          <figure class="panel" role="tabpanel" id="panel-teks" aria-labelledby="tab-teks" hidden>
+            <img src="img/screenshot-teks.png" width="1174" height="96" alt="Banner gaya Teks berjalan: kotak Maghrib 17:51 di kiri dan teks berjalan bergaya LED." loading="lazy">
+            <figcaption>Teks berjalan, warna Subuh. Klik kiri untuk menutup, klik kanan untuk menunda.</figcaption>
+          </figure>
+          <figure class="panel" role="tabpanel" id="panel-minimal" aria-labelledby="tab-minimal" hidden>
+            <div class="minimal-demo">
+              <p class="mini-cap">Waktu sholat</p>
+              <p class="mini-ar" lang="ar" dir="rtl">حَيَّ عَلَى الصَّلَاةِ</p>
+              <p class="mini-name">Maghrib</p>
+              <p class="mini-sub">17:51 · Jakarta</p>
+            </div>
+            <figcaption>Minimal, digambar ulang di halaman ini. Di desktop, latarnya adalah layarmu sendiri yang diburamkan.</figcaption>
+          </figure>
+        </div>
+      </div>
+
+      <div class="swatches">
+        <p>Warna</p>
+        <ul>
+          <li><span class="sw sw-omarchy" aria-hidden="true"></span>Ikut tema Omarchy</li>
+          <li><span class="sw" style="--c:#f5c542" aria-hidden="true"></span>Senja</li>
+          <li><span class="sw" style="--c:#8fc8ff" aria-hidden="true"></span>Subuh</li>
+          <li><span class="sw" style="--c:#d4af37" aria-hidden="true"></span>Masjid</li>
+          <li><span class="sw" style="--c:#b7b4ff" aria-hidden="true"></span>Malam</li>
+        </ul>
+      </div>
+    </section>
+
+    <section id="widget" class="widget" aria-labelledby="widget-judul">
+      <div class="barstrip" aria-hidden="true">
+        <span class="bar-ws">1 2 3 4 5</span>
+        <span class="bar-center"><span class="bar-clock">17:24</span><span class="bar-pill"><img src="img/icon.svg" alt="" width="14" height="14"> Maghrib · 26m</span></span>
+        <span class="bar-ws">wifi · 80%</span>
+      </div>
+      <div class="widget-grid">
+        <div class="widget-copy">
+          <h2 id="widget-judul">Di Omarchy, semuanya ada di bar</h2>
+          <p>Widget duduk di sebelah jam dan hanya menampilkan nama sholat berikutnya serta sisa waktunya. Jam adzannya ada di dalam, supaya tidak ada dua jam berdempetan.</p>
+          <ul class="facts">
+            <li><strong>Klik</strong> untuk jadwal hari ini, jadwal bulanan, adzan on/off, dan memilih gaya serta warna.</li>
+            <li><strong>Klik kanan</strong> saat adzan berbunyi untuk menghentikannya.</li>
+            <li><strong>Menyala</strong> saat waktu sholat tinggal 10 menit.</li>
+            <li>Ikon tray disembunyikan supaya tidak dobel. Di XFCE dan KDE, kontrol yang sama ada di menu tray.</li>
+          </ul>
+        </div>
+        <figure class="popup-demo">
+          <div class="popup" aria-hidden="true">
+            <p class="pp-title">Maghrib dalam 26m</p>
+            <p class="pp-sub">Jakarta · 12 Jumadil Akhir 1448 H</p>
+            <dl class="pp-times">
+              <div class="minor"><dt>Imsak</dt><dd>03:53</dd></div>
+              <div><dt>Subuh</dt><dd>04:03</dd></div>
+              <div class="minor"><dt>Terbit</dt><dd>05:26</dd></div>
+              <div><dt>Dzuhur</dt><dd>11:39</dd></div>
+              <div><dt>Ashar</dt><dd>15:03</dd></div>
+              <div class="next"><dt>Maghrib</dt><dd>17:51</dd></div>
+              <div><dt>Isya</dt><dd>19:06</dd></div>
+            </dl>
+            <p class="pp-row">Jadwal bulanan</p>
+            <p class="pp-row">Putar adzan otomatis <span>✓</span></p>
+            <p class="pp-label">Gaya pengingat</p>
+            <p class="pp-chips"><span>Kartu</span><span class="on">Digital</span><span>Teks berjalan</span><span>Minimal</span></p>
+          </div>
+          <figcaption>Popup widget, dibuat ulang dengan HTML. Contoh jadwal Jakarta, 22 November 2026.</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section id="jadwal" class="check" aria-labelledby="jadwal-judul">
+      <div class="check-head">
+        <h2 id="jadwal-judul">Cek jadwal kotamu</h2>
+        <p>Sumber yang sama dengan aplikasinya: AlAdhan, metode Kemenag RI. Permintaan dikirim langsung dari browsermu ke api.aladhan.com, tanpa server kami.</p>
+      </div>
+      <form class="check-form" id="check-form" novalidate>
+        <div class="field">
+          <label for="kota">Kota</label>
+          <input id="kota" name="kota" type="text" autocomplete="address-level2" placeholder="Misalnya: Bandung" required>
+        </div>
+        <div class="field">
+          <label for="negara">Negara</label>
+          <input id="negara" name="negara" type="text" autocomplete="country-name" value="Indonesia" required>
+        </div>
+        <button class="btn btn-amber" type="submit" id="check-btn">Tampilkan jadwal</button>
+      </form>
+      <div class="check-out" id="check-out" aria-live="polite">
+        <p class="state state-empty">Ketik nama kota, lalu tampilkan jadwal hari ini beserta hitung mundur ke sholat berikutnya.</p>
+      </div>
+    </section>
+
+    <section id="pasang" class="install" aria-labelledby="pasang-judul">
+      <h2 id="pasang-judul">Pasang dalam dua langkah</h2>
+      <div class="install-grid">
+        <div class="step">
+          <h3>1. Dependensi</h3>
+          <div class="seg-switch" role="tablist" aria-label="Distro">
+            <button role="tab" id="tab-arch" aria-controls="dep-arch" aria-selected="true" type="button">Arch / Omarchy</button>
+            <button role="tab" id="tab-deb" aria-controls="dep-deb" aria-selected="false" tabindex="-1" type="button">Debian / Ubuntu / Mint</button>
+          </div>
+          <div class="code" role="tabpanel" id="dep-arch" aria-labelledby="tab-arch">
+            <pre><code>sudo pacman -S python-gobject gtk3 libayatana-appindicator libnotify ffmpeg grim</code></pre>
+            <button class="copy" type="button">Salin</button>
+          </div>
+          <div class="code" role="tabpanel" id="dep-deb" aria-labelledby="tab-deb" hidden>
+            <pre><code>sudo apt install python3-gi gir1.2-gtk-3.0 gir1.2-ayatanaappindicator3-0.1 libnotify-bin ffmpeg</code></pre>
+            <button class="copy" type="button">Salin</button>
+          </div>
+        </div>
+        <div class="step">
+          <h3>2. Ambil dan pasang</h3>
+          <div class="code">
+            <pre><code>git clone https://github.com/ibeeng/sholat-tray.git
+cd sholat-tray
+./install.sh</code></pre>
+            <button class="copy" type="button">Salin</button>
+          </div>
+          <p>Tanpa sudo. Di Omarchy, installer ikut memasang widget bar, aturan jendela Hyprland, dan autostart. Hapus kapan saja dengan <code>./uninstall.sh</code>.</p>
+        </div>
+      </div>
+      <p class="note"><strong>File adzan tidak disertakan.</strong> Taruh rekaman milikmu di <code>~/.local/share/sholat-tray/adzan.mp3</code> dan <code>adzan-fajr.ogg</code> untuk Subuh.</p>
+      <p class="sr-only" id="copy-status" aria-live="polite"></p>
+    </section>
+
+    <section class="privacy" aria-labelledby="privasi-judul">
+      <h2 id="privasi-judul">Ke mana saja aplikasinya terhubung</h2>
+      <p>Sholat Tray tidak punya server sendiri. Cache disimpan lokal di <code>~/.cache/sholat-tray/</code>.</p>
+      <table>
+        <thead><tr><th scope="col">Layanan</th><th scope="col">Untuk</th><th scope="col">Kapan</th></tr></thead>
+        <tbody>
+          <tr><td>ip-api.com</td><td>Perkiraan kota dari IP (HTTP biasa)</td><td>Tiap 30 menit, hanya jika <code>AUTO=1</code></td></tr>
+          <tr><td>api.aladhan.com</td><td>Jadwal sholat dan tanggal Hijriah</td><td>Sekali sehari</td></tr>
+          <tr><td>api.myquran.com</td><td>Jadwal resmi kota Indonesia</td><td>Sekali sehari, hanya jika dipilih</td></tr>
+        </tbody>
+      </table>
+      <p>Tidak mau lokasi dideteksi dari IP? Set <code>AUTO=0</code> dan <code>CITY=</code> kotamu di config.</p>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <p>Sholat Tray · MIT · dibuat oleh <a href="https://github.com/ibeeng">ibeeng</a></p>
+    <p>Jadwal dari AlAdhan dan MyQuran. Tetap cocokkan dengan jadwal masjid setempat.</p>
+  </footer>
+</body>
+</html>

@@ -1,6 +1,8 @@
 # Sholat Tray
 
-Pengingat waktu sholat untuk desktop Linux. Ikon di tray dengan jadwal hari ini, notifikasi 10 menit sebelum waktu sholat, layar pengingat saat masuk waktu, dan adzan.
+Pengingat waktu sholat untuk desktop Linux. Halaman proyek: **https://ibeeng.github.io/sholat-tray/**
+
+Ikon di tray dengan jadwal hari ini, notifikasi 10 menit sebelum waktu sholat, layar pengingat saat masuk waktu, dan adzan.
 
 Jalan di **Omarchy / Hyprland** (lengkap dengan widget hitung mundur di bar), **XFCE**, **KDE**, dan desktop lain yang punya system tray.
 

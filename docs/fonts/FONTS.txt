@@ -1,0 +1,6 @@
+Fonts in this folder are self-hosted copies from Google Fonts, licensed under
+the SIL Open Font License 1.1 (https://openfontlicense.org):
+
+- Big Shoulders Display, by Patric King (XXIX)
+- Plus Jakarta Sans, by Tokotype
+- Amiri (Arabic subset), by Khaled Hosny
