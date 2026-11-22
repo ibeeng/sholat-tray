@@ -1,0 +1,21 @@
+{
+  "title": "Waktu sholat",
+  "nextIn": "%1 dalam %2",
+  "missing": "Sholat Tray belum berjalan",
+  "monthly": "Jadwal bulanan",
+  "adzanAuto": "Putar adzan otomatis",
+  "stopAdzan": "Hentikan adzan",
+  "playing": "Adzan sedang diputar. Klik kanan untuk berhenti",
+  "testReminder": "Coba layar pengingat",
+  "style": "Gaya pengingat",
+  "color": "Warna",
+  "style.kartu": "Kartu",
+  "style.digital": "Digital",
+  "style.teks": "Teks berjalan",
+  "style.minimal": "Minimal",
+  "color.omarchy": "Ikut tema Omarchy",
+  "color.senja": "Senja (emas)",
+  "color.subuh": "Subuh (biru fajar)",
+  "color.masjid": "Masjid (hijau-emas)",
+  "color.malam": "Malam (ungu)"
+}

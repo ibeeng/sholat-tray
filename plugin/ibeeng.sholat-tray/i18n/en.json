@@ -1,0 +1,21 @@
+{
+  "title": "Prayer times",
+  "nextIn": "%1 in %2",
+  "missing": "Sholat Tray is not running",
+  "monthly": "Monthly schedule",
+  "adzanAuto": "Play adzan automatically",
+  "stopAdzan": "Stop adzan",
+  "playing": "Adzan is playing. Right-click to stop",
+  "testReminder": "Preview reminder",
+  "style": "Reminder style",
+  "color": "Colors",
+  "style.kartu": "Card",
+  "style.digital": "Digital",
+  "style.teks": "Running text",
+  "style.minimal": "Minimal",
+  "color.omarchy": "Follow Omarchy theme",
+  "color.senja": "Dusk (gold)",
+  "color.subuh": "Dawn (blue)",
+  "color.masjid": "Mosque (green-gold)",
+  "color.malam": "Night (purple)"
+}

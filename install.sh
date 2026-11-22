@@ -1,84 +1,74 @@
 #!/usr/bin/env bash
-# Installer sholat-tray untuk XFCE / Linux desktop (GTK3).
-# Jalankan: bash install.sh
-set -e
+# Sholat Tray installer (per user, tanpa sudo).
+set -euo pipefail
 
-HOME_DIR="$HOME"
-BIN_DIR="$HOME_DIR/bin"
-CONF_DIR="$HOME_DIR/.config"
-CACHE_DIR="$HOME_DIR/.cache"
-AUTOSTART_DIR="$CONF_DIR/autostart"
-PKG_DIR="$(cd "$(dirname "$0")" && pwd)"
+SRC="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+BIN="$HOME/.local/bin"
+DATA="${XDG_DATA_HOME:-$HOME/.local/share}"
+CONFIG="${XDG_CONFIG_HOME:-$HOME/.config}"
+PLUGIN_ID="ibeeng.sholat-tray"
 
-echo "==> Sholat Tray installer"
-echo "    Home: $HOME_DIR"
+say()  { printf '\033[1;33m::\033[0m %s\n' "$*"; }
+warn() { printf '\033[1;31m!!\033[0m %s\n' "$*"; }
 
-# --- 1. dependencies check ---
-echo "==> Cek dependencies..."
-MISSING=()
-
-python3 -c "import gi" 2>/dev/null || MISSING+=("python3-gi")
-python3 -c "gi.require_version('Gtk','3.0'); from gi.repository import Gtk" 2>/dev/null || MISSING+=("gir1.2-gtk-3.0")
-python3 -c "gi.require_version('AyatanaAppIndicator3','0.1'); from gi.repository import AyatanaAppIndicator3" 2>/dev/null || MISSING+=("gir1.2-ayatanaappindicator3-0.1")
-python3 -c "import PIL" 2>/dev/null || MISSING+=("python3-pil")
-
-if command -v apt-get >/dev/null 2>&1 && [ ${#MISSING[@]} -gt 0 ]; then
-    echo "    Paket belum ada: ${MISSING[*]}"
-    echo "    Install dengan:"
-    echo "      sudo apt install -y ${MISSING[*]}"
-    echo
-    read -rp "    Mau install sekarang (perlu sudo)? [y/N] " yn
-    if [[ "$yn" =~ ^[Yy]$ ]]; then
-        sudo apt install -y "${MISSING[@]}"
-    else
-        echo "    Skip. Install manual nanti kalau app gagal jalan."
-    fi
-elif [ ${#MISSING[@]} -gt 0 ]; then
-    echo "    Paket belum ada (install manual): ${MISSING[*]}"
+# --- cek dependensi ---------------------------------------------------------
+missing=()
+python3 - <<'PY' 2>/dev/null || missing+=("python-gobject + GTK3 + libayatana-appindicator")
+import gi
+gi.require_version('Gtk', '3.0'); gi.require_version('AyatanaAppIndicator3', '0.1')
+from gi.repository import Gtk, AyatanaAppIndicator3
+PY
+command -v notify-send >/dev/null || missing+=("libnotify (notify-send)")
+if ((${#missing[@]})); then
+  warn "Dependensi belum ada: ${missing[*]}"
+  echo "   Arch/Omarchy : sudo pacman -S python-gobject gtk3 libayatana-appindicator libnotify ffmpeg grim"
+  echo "   Debian/Ubuntu: sudo apt install python3-gi gir1.2-gtk-3.0 gir1.2-ayatanaappindicator3-0.1 libnotify-bin ffmpeg"
+  exit 1
 fi
+command -v ffplay >/dev/null || command -v mpg123 >/dev/null || command -v paplay >/dev/null \
+  || warn "Tidak ada pemutar audio (ffplay/mpg123/paplay): adzan tidak akan bunyi."
 
-# --- 2. copy app ---
-echo "==> Copy app..."
-mkdir -p "$BIN_DIR" "$CACHE_DIR"
-install -m 755 "$PKG_DIR/bin/sholat-tray.py" "$BIN_DIR/sholat-tray.py"
-install -m 644 "$PKG_DIR/assets/sholat-sky.jpg" "$CACHE_DIR/sholat-sky.jpg" 2>/dev/null || true
+# --- file aplikasi ----------------------------------------------------------
+say "Pasang sholat-tray ke $BIN"
+install -Dm755 "$SRC/sholat-tray.py" "$BIN/sholat-tray"
+install -Dm755 "$SRC/extras/sholat-tray-genmon.sh" "$BIN/sholat-tray-genmon"
+install -Dm644 "$SRC/assets/sholat-tray.svg" "$DATA/icons/hicolor/scalable/apps/sholat-tray.svg"
+install -Dm644 "$SRC/assets/sholat-tray-symbolic.svg" "$DATA/icons/hicolor/symbolic/apps/sholat-tray-symbolic.svg"
+install -Dm644 "$SRC/sholat-tray.desktop" "$DATA/applications/sholat-tray.desktop"
+sed -i "s#^Exec=.*#Exec=$BIN/sholat-tray#" "$DATA/applications/sholat-tray.desktop"
+gtk-update-icon-cache -q -t "$DATA/icons/hicolor" 2>/dev/null || true
+mkdir -p "$DATA/sholat-tray"
 
-# --- 3. generate card bg ---
-echo "==> Generate card background..."
-python3 "$PKG_DIR/gen-card-bg.py" || echo "    (warning) gagal generate card bg — overlay tetap jalan pakai fallback"
+# --- integrasi desktop ------------------------------------------------------
+if command -v omarchy >/dev/null && [[ -d "$CONFIG/hypr" ]]; then
+  say "Omarchy terdeteksi: widget bar, window rules, autostart"
+  upgrade=0; [[ -d "$CONFIG/omarchy/plugins/$PLUGIN_ID" ]] && upgrade=1
+  rm -rf "$CONFIG/omarchy/plugins/$PLUGIN_ID"
+  mkdir -p "$CONFIG/omarchy/plugins"
+  cp -r "$SRC/plugin/$PLUGIN_ID" "$CONFIG/omarchy/plugins/"
 
-# --- 4. autostart ---
-echo "==> Pasang autostart..."
-mkdir -p "$AUTOSTART_DIR"
-cat > "$AUTOSTART_DIR/sholat-tray.desktop" <<EOF
-[Desktop Entry]
-Name=Waktu Sholat Tray
-Comment=Penunjuk waktu sholat di panel XFCE (Kemenag)
-Exec=$BIN_DIR/sholat-tray.py
-Icon=preferences-system-time
-Terminal=false
-Type=Application
-Categories=Utility;
-X-GNOME-Autostart-enabled=true
-EOF
-
-# --- 5. start now (kalau belum jalan) ---
-if pgrep -f "$BIN_DIR/sholat-tray.py" >/dev/null 2>&1 || pgrep -f "bin/sholat-tray.py" >/dev/null 2>&1; then
-    echo "==> Sholat tray sudah jalan, skip start."
+  install -Dm644 "$SRC/hypr/sholat_tray.lua" "$CONFIG/hypr/sholat_tray.lua"
+  if ! grep -q 'require("hypr.sholat_tray")' "$CONFIG/hypr/hyprland.lua"; then
+    cp "$CONFIG/hypr/hyprland.lua" "$CONFIG/hypr/hyprland.lua.bak.$(date +%s)"
+    echo 'require("hypr.sholat_tray")  -- Sholat Tray' >> "$CONFIG/hypr/hyprland.lua"
+  fi
+  if ! grep -q 'sholat-tray' "$CONFIG/hypr/autostart.lua" 2>/dev/null; then
+    echo "o.launch_on_start(\"$BIN/sholat-tray\")  -- Sholat Tray" >> "$CONFIG/hypr/autostart.lua"
+  fi
+  hyprctl reload >/dev/null 2>&1 || true
+  grep -q "\"$PLUGIN_ID\"" "$CONFIG/omarchy/shell.json" 2>/dev/null \
+    || omarchy bar put "$PLUGIN_ID" --after omarchy.clock || true
+  # shell tidak selalu memuat ulang plugin yang diganti seluruhnya
+  ((upgrade)) && omarchy restart shell >/dev/null 2>&1 || true
 else
-    echo "==> Start sholat tray..."
-    nohup "$BIN_DIR/sholat-tray.py" >/dev/null 2>&1 &
-    sleep 2
-    if pgrep -f "sholat-tray.py" >/dev/null 2>&1; then
-        echo "    OK, jalan."
-    else
-        echo "    (warning) belum terdeteksi jalan — coba manual: $BIN_DIR/sholat-tray.py"
-    fi
+  say "Pasang autostart XDG"
+  install -Dm644 "$DATA/applications/sholat-tray.desktop" "$CONFIG/autostart/sholat-tray.desktop"
 fi
 
-echo
-echo "==> Selesai!"
-echo "    Icon tray muncul di panel (deket jam)."
-echo "    Test overlay : python3 $BIN_DIR/sholat-tray.py --test-overlay Maghrib"
-echo "    Stop         : pkill -f sholat-tray.py"
-echo "    Auto start   : pas login (autostart sudah dipasang)"
+# --- jalankan ---------------------------------------------------------------
+pkill -f "$BIN/sholat-tray\$" 2>/dev/null || true
+setsid -f "$BIN/sholat-tray" >/dev/null 2>&1 || true
+
+say "Selesai. Sholat Tray sudah berjalan."
+echo "   Adzan: taruh adzan.mp3 dan adzan-fajr.ogg di $DATA/sholat-tray/"
+echo "   Config: $CONFIG/sholat-tray/sholat-tray.conf"

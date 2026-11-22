@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "id": "ibeeng.sholat-tray",
+  "name": "Sholat Tray",
+  "version": "1.0.0",
+  "author": "ibeeng",
+  "description": "Next prayer time and countdown from Sholat Tray",
+  "kinds": ["bar-widget"],
+  "entryPoints": { "barWidget": "BarWidget.qml" },
+  "barWidget": {
+    "displayName": "Sholat Tray",
+    "description": "Next prayer time and countdown",
+    "category": "Info",
+    "allowMultiple": false,
+    "defaultSection": "centerEnd"
+  }
+}

@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Application
+Name=Sholat Tray
+GenericName=Prayer Time Reminder
+Comment=Pengingat waktu sholat di tray, dengan notifikasi dan adzan
+Exec=sholat-tray
+Icon=sholat-tray
+Terminal=false
+Categories=Utility;
+Keywords=sholat;salat;prayer;adzan;azan;islam;
+StartupNotify=false
+X-GNOME-Autostart-enabled=true

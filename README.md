@@ -1,193 +1,135 @@
-<div align="center">
+# Sholat Tray
 
-# 🕌 Sholat Tray
+Pengingat waktu sholat untuk desktop Linux. Ikon di tray dengan jadwal hari ini, notifikasi 10 menit sebelum waktu sholat, layar pengingat saat masuk waktu, dan adzan.
 
-**Widget pengingat waktu sholat untuk Linux desktop**
+Jalan di **Omarchy / Hyprland** (lengkap dengan widget hitung mundur di bar), **XFCE**, **KDE**, dan desktop lain yang punya system tray.
 
-Icon tray di panel + poster card overlay muncul otomatis pas waktunya sholat.
-Jadwal dari Aladhan API (method 20 = Kemenag Indonesia), lokasi otomatis via IP.
-
-</div>
-
----
-
-## ✨ Fitur
-
-| Fitur | Detail |
+| Gaya Kartu | Gaya Digital |
 |---|---|
-| 🕐 **Tray icon** | Nongol di system panel (deket jam), klik kanan buat jadwal & menu |
-| 📍 **Lokasi otomatis** | Deteksi kota via IP geolocation, refresh tiap 30 menit |
-| 📅 **Jadwal akurat** | Aladhan API, method 20 = Kemenag Indonesia |
-| 🔔 **Notif H-10 menit** | Notifikasi desktop 10 menit sebelum waktu sholat |
-| 🌅 **Poster overlay** | Card muncul pas waktunya: sky banner, angled cut, jam besar |
-| ⏰ **Snooze** | Tunda 5 menit kalau lagi sibuk |
-| 🚪 **Non-intrusif** | Auto-close 10 menit, bisa Esc, nggak fullscreen |
-| 🔄 **Offline fallback** | Pakai cache jadwal kalau internet mati |
+| ![Gaya Kartu, warna Senja](assets/screenshot-kartu.png) | ![Gaya Digital, warna Masjid](assets/screenshot-digital.png) |
 
-## 📦 Install
+Gaya Teks berjalan, banner tipis yang tidak menutup layar:
 
-### Cara cepat (1 command)
+![Gaya Teks berjalan, warna Subuh](assets/screenshot-teks.png)
+
+## Fitur
+
+- Jadwal Imsak, Subuh, Terbit, Dhuha, Dzuhur, Ashar, Maghrib, Isya, plus tanggal Hijriah
+- Lokasi otomatis dari IP, atau set kota sendiri
+- Dua sumber jadwal: **AlAdhan** (koordinat, metode Kemenag RI) atau **MyQuran** (jadwal resmi kota Indonesia)
+- Notifikasi 10 menit sebelum waktu sholat
+- Layar pengingat saat masuk waktu sholat wajib, dengan 4 gaya:
+  - **Kartu**: kartu bergambar langit di atas desktop yang di-blur
+  - **Digital**: jam 7-segmen besar ala jam masjid, lengkap dengan hitungan sejak adzan
+  - **Teks berjalan**: banner running text di atas layar; tidak menutup kerjaan, tidak merebut fokus
+  - **Minimal**: nama sholat besar dan lafaz *hayya 'alash-shalah* di atas desktop yang di-blur
+- Tutup dengan tombol atau `Esc`, atau tunda 5 menit (gaya Teks berjalan: klik kiri tutup, klik kanan tunda)
+- Adzan otomatis (adzan Subuh bisa beda file), dengan tombol stop dan tes
+- Jadwal satu bulan penuh
+- Warna: ikut tema Omarchy, atau preset Senja, Subuh, Masjid, Malam. Bebas dipadukan dengan gaya mana pun
+- Omarchy: widget bar `󱠧 Maghrib · 38m` yang menyala saat waktu sholat tinggal 10 menit
+
+## Pasang
+
+Dependensi:
+
+```bash
+# Arch / Omarchy
+sudo pacman -S python-gobject gtk3 libayatana-appindicator libnotify ffmpeg grim
+
+# Debian / Ubuntu / Linux Mint
+sudo apt install python3-gi gir1.2-gtk-3.0 gir1.2-ayatanaappindicator3-0.1 libnotify-bin ffmpeg
+```
+
+Lalu:
 
 ```bash
 git clone https://github.com/ibeeng/sholat-tray.git
 cd sholat-tray
-bash install.sh
+./install.sh
 ```
 
-### Cara manual (tanpa git)
+Installer bekerja per user (tanpa sudo):
 
-Download ZIP dari GitHub (tombol hijau **Code** → **Download ZIP**), extract, lalu:
+- `sholat-tray` ke `~/.local/bin/`, ikon dan entri menu aplikasi
+- **Omarchy:** widget bar `ibeeng.sholat-tray` (di sebelah jam), window rules Hyprland di `~/.config/hypr/sholat_tray.lua`, dan autostart
+- **Desktop lain:** autostart lewat `~/.config/autostart/sholat-tray.desktop`
 
-```bash
-cd sholat-tray-master
-bash install.sh
+Hapus dengan `./uninstall.sh`. Config dan file adzan tidak ikut terhapus.
+
+### Omarchy vs desktop lain
+
+- **Omarchy:** semua kontrol ada di widget bar. Klik widget untuk jadwal hari ini, jadwal bulanan, adzan on/off, coba layar pengingat, dan memilih gaya serta warna. Klik kanan saat adzan berbunyi untuk menghentikannya. Ikon tray tidak ditampilkan supaya tidak dobel.
+- **XFCE, KDE, dll.:** kontrol yang sama ada di menu ikon tray.
+
+Atur lewat `TRAY=auto|1|0` di config kalau ingin memaksa ikon tray tampil atau sembunyi.
+
+### Adzan
+
+File audio adzan **tidak disertakan**. Taruh file milikmu sendiri di:
+
+```
+~/.local/share/sholat-tray/adzan.mp3        # Dzuhur, Ashar, Maghrib, Isya
+~/.local/share/sholat-tray/adzan-fajr.ogg   # Subuh
 ```
 
-### Apa yang dilakuin installer
+Atau arahkan ke file lain lewat `ADZAN_FILE` / `ADZAN_FAJR_FILE` di config.
 
-1. ✅ Cek dependencies — kalau kurang, tawarin install otomatis via `apt`
-2. ✅ Copy app ke `~/bin/sholat-tray.py`
-3. ✅ Copy assets ke `~/.cache/`
-4. ✅ Generate card background (sky banner + rounded corners)
-5. ✅ Pasang autostart (jalan otomatis tiap login)
-6. ✅ Start app langsung
+## Pengaturan
 
-## 🖥️ Requirements
-
-| Kebutuhan | Keterangan |
-|---|---|
-| **OS** | Linux + GTK3 (XFCE, GNOME, Cinnamon, Budgie, dll) |
-| **Python** | 3.8+ |
-| **Paket apt** | `python3-gi` `gir1.2-gtk-3.0` `gir1.2-ayatanaappindicator3-0.1` `python3-pil` |
-| **Font** | Inter (opsional — fallback ke system sans) |
-| **Internet** | Untuk fetch jadwal (ada fallback cache kalau offline) |
-
-> **Debian/Ubuntu/Mint**: semua paket ada di repo utama.
-> **Fedora**: `sudo dnf install python3-gobject gtk3 libappindicator-gtk3 python3-pillow`
-> **Arch**: `sudo pacman -S python-gobject gtk3 libappindicator-gtk3 python-pillow`
-
-## 🎮 Cara Pakai
-
-### Klik kanan icon tray
-
-- Lihat jadwal sholat hari ini (Subuh s/d Isya)
-- **Refresh + cek lokasi** — kalau pindah kota/rumah
-- **Tes layar pengingat** — preview overlay-nya
-- **Jadwal lengkap (browser)** — buka jadwalsholat.org
-
-### Perintah berguna
-
-```bash
-# Tes overlay tanpa nunggu maghrib
-python3 ~/bin/sholat-tray.py --test-overlay Maghrib
-
-# Stop app
-pkill -f sholat-tray.py
-
-# Start manual
-python3 ~/bin/sholat-tray.py
-```
-
-### Ganti kota (misal pindah rumah)
-
-Edit `~/.config/sholat-kota.conf`:
+Kebanyakan bisa diatur dari widget bar atau menu tray: gaya, warna, sumber jadwal, adzan on/off. Sisanya di `~/.config/sholat-tray/sholat-tray.conf`:
 
 ```ini
-AUTO=0
-CITY=Bandung
+AUTO=1                 # 1 = lokasi dari IP, 0 = pakai CITY di bawah
+CITY=Jakarta
 COUNTRY=Indonesia
-METHOD=20
+SOURCE=aladhan         # aladhan | myquran
+METHOD=20              # metode hitung AlAdhan (20 = Kemenag RI)
+MYQURAN_CITY=          # nama kota untuk MyQuran (kosong = ikut CITY/lokasi)
+MYQURAN_ID=            # atau langsung id kota MyQuran
+GAYA=kartu             # kartu | digital | teks | minimal
+TEMA=omarchy           # warna: omarchy | senja | subuh | masjid | malam
+TRAY=auto              # auto = sembunyi kalau widget bar Omarchy terpasang
+ADZAN=1
+ADZAN_VOLUME=80        # 0-100 (ffplay)
+ADZAN_FILE=~/.local/share/sholat-tray/adzan.mp3
+ADZAN_FAJR_FILE=~/.local/share/sholat-tray/adzan-fajr.ogg
 ```
 
-Simpan, lalu klik kanan tray → **Refresh + cek lokasi**.
+### Perintah
 
-> `AUTO=1` (default) = lokasi otomatis via IP. Set `AUTO=0` buat manual.
-
-## 🎨 Kustomisasi Tampilan
-
-### Ganti sky image
-
-1. Siapin gambar landscape (misal foto langit sendiri)
-2. Timpa `assets/sholat-sky.jpg`
-3. Regenerate:
+Saat Sholat Tray berjalan, perintah ini diteruskan ke aplikasi yang sudah jalan (dipakai juga oleh widget bar):
 
 ```bash
-python3 gen-card-bg.py
+sholat-tray test-overlay Maghrib digital   # coba layar pengingat
+sholat-tray style teks                     # kartu | digital | teks | minimal
+sholat-tray color masjid                   # omarchy | senja | subuh | masjid | malam
+sholat-tray monthly                        # jadwal bulanan
+sholat-tray adzan toggle                   # on | off | toggle
+sholat-tray stop-adzan
+sholat-tray refresh                        # muat ulang jadwal + cek lokasi
+sholat-tray --preview digital malam        # pratinjau tanpa aplikasi berjalan
+sholat-tray --help
 ```
 
-### Utak-atik card
+### XFCE panel (opsional)
 
-Edit `gen-card-bg.py`:
+Untuk menampilkan hitung mundur langsung di panel XFCE, tambahkan **Generic Monitor** dengan perintah `sholat-tray-genmon` dan periode 30 detik.
 
-```python
-W, H = 640, 560      # ukuran card
-CARD_R = 28           # radius sudut rounded
-banner_h = H * 0.38   # tinggi sky banner
-M_left / M_right      # sudut angled cut
-(14, 14, 18)          # warna body
-```
+## Privasi dan jaringan
 
-Lalu regenerate & restart:
+Sholat Tray tidak punya server sendiri. Aplikasi ini memanggil:
 
-```bash
-python3 gen-card-bg.py
-pkill -f sholat-tray.py && python3 ~/bin/sholat-tray.py &
-```
+| Layanan | Untuk | Kapan |
+|---|---|---|
+| `ip-api.com` | perkiraan kota dan koordinat dari IP (HTTP) | tiap 30 menit, hanya jika `AUTO=1` |
+| `api.aladhan.com` | jadwal sholat dan tanggal Hijriah | sekali sehari, dan saat membuka jadwal bulanan |
+| `api.myquran.com` | jadwal kota Indonesia | sekali sehari, hanya jika `SOURCE=myquran` |
 
-### Ubah teks pesan
+Set `AUTO=0` dan `CITY=...` kalau tidak ingin lokasi dideteksi dari IP. Semua cache disimpan lokal di `~/.cache/sholat-tray/`.
 
-Edit di `bin/sholat-tray.py`, cari `waktunya sholat, bro` — ganti sesuka hati.
+## Lisensi
 
-## 📁 Struktur Project
+MIT © 2026 ibeeng. Lihat [LICENSE](LICENSE).
 
-```
-sholat-tray/
-├── bin/
-│   └── sholat-tray.py        # App utama: tray + overlay + jadwal
-├── assets/
-│   ├── sholat-sky.jpg        # Banner langit (bisa diganti)
-│   └── sholat-card-bg.png    # Card background (di-generate)
-├── gen-card-bg.py            # Generator card background
-├── install.sh                # Installer 1-command
-└── README.md
-```
-
-## ❓ Troubleshooting
-
-**Icon tray nggak muncul**
-→ Pastikan panel XFCE punya **Status Tray Plugin / Notification** area. Klik kanan panel → Panel → Add New Items → cari "Status Tray Plugin".
-
-**Overlay nggak muncul pas waktunya**
-→ Cek app jalan: `ps aux | grep sholat-tray`. Test manual: `python3 ~/bin/sholat-tray.py --test-overlay Maghrib`
-
-**Jadwal salah / kota salah**
-→ Klik kanan tray → Refresh + cek lokasi. Atau set manual di `~/.config/sholat-kota.conf`
-
-**Error `AyatanaAppIndicator3 not found`**
-→ `sudo apt install gir1.2-ayatanaappindicator3-0.1`
-
-**Font nggak sama kaya screenshot**
-→ Install Inter: [rsms.me/inter](https://rsms.me/inter/) atau `sudo apt install fonts-inter`
-
-## 📸 Preview
-
-Overlay muncul pas waktunya sholat — card kecil di tengah layar, nggak nutupin kerjaan:
-
-- Sky banner maghrib + bulan sabit + bokeh ✨
-- Angled cut ke body gelap
-- Nama sholat + jam besar + kota
-- Tombol **Lanjut kerja** & **Tunda 5 menit**
-
-## 📄 License
-
-MIT — bebas dipakai, dimodif, dibagikan.
-
----
-
-<div align="center">
-
-**Dibuat dengan 🖤 oleh [ibeeng](https://github.com/ibeeng)**
-
-Kalau berguna, kasih ⭐ ya!
-
-</div>
+Jadwal sholat bersumber dari [AlAdhan](https://aladhan.com) dan [MyQuran](https://api.myquran.com). Selalu cocokkan dengan jadwal masjid setempat.
